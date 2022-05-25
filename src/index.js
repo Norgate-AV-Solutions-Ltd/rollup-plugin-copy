@@ -114,7 +114,13 @@ export default function copy(options = {}) {
           if (transformed) {
             await fs.outputFile(dest, contents, restPluginOptions)
           } else {
-            await fs.copy(src, dest, restPluginOptions)
+            try {
+              await fs.copy(src, dest, restPluginOptions);
+            } catch (e) {
+              if (e.code !== 'EEXIST' || restPluginOptions.errorOnExist) {
+                throw e;
+              }
+            }
           }
 
           if (verbose) {
